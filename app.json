@@ -2,16 +2,24 @@
   "expo": {
     "name": "UniMeet",
     "slug": "unimeet",
-    "version": "1.0.0",
-    "scheme": "unimeet",
+    "version": "0.1.0",
     "orientation": "portrait",
+    "scheme": "unimeet",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
-    "ios": { "supportsTablet": false },
-    "android": {
-      "adaptiveIcon": { "backgroundColor": "#1A2E5A" }
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
     },
-    "plugins": ["expo-router"],
-    "experiments": { "typedRoutes": true }
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1A2E5A"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
