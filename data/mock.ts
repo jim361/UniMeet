@@ -24,6 +24,7 @@ export const clubs: Club[] = [
       ja: 'さまざまな国籍の学生が集まり、言語交換と文化交流を行うサークルです。誰でも歓迎します。',
       zh: '这是一个由不同国籍学生一起进行语言交换和文化交流的社团。欢迎所有人参加。',
       vi: 'Đây là câu lạc bộ nơi sinh viên từ nhiều quốc gia cùng trao đổi ngôn ngữ và văn hóa. Tất cả mọi người đều được chào đón.',
+      fa: 'گلوبال سیتیزنز باشگاهی است که دانشجویان از ملیت‌های مختلف زبان و فرهنگ را به اشتراک می‌گذارند. همه خوش‌آمد هستند.',
     },
     tagline: '언어와 문화를 함께 나누는 캠퍼스 교류 동아리',
     taglineTranslations: {
@@ -31,6 +32,7 @@ export const clubs: Club[] = [
       ja: '言語と文化を一緒に分かち合うキャンパス交流サークル',
       zh: '一起分享语言和文化的校园交流社团',
       vi: 'Câu lạc bộ giao lưu trong khuôn viên để chia sẻ ngôn ngữ và văn hóa',
+      fa: 'باشگاه تبادلی دانشگاهی برای اشتراک‌گذاری زبان‌ها و فرهنگ‌ها',
     },
     tags: ['English/Korean', '유학생 환영', '모집 중'],
     language: 'both',
@@ -45,6 +47,7 @@ export const clubs: Club[] = [
       ja: '毎週水曜日 18:30、学生会館302号室',
       zh: '每周三 18:30，学生会馆302室',
       vi: 'Thứ Tư hàng tuần lúc 18:30, Phòng 302 Trung tâm Sinh viên',
+      fa: 'هر چهارشنبه ساعت ۱۸:۳۰، اتاق ۳۰۲ مرکز دانشجویی',
     },
     recruitInfo:
       '언어 교환, 문화 교류, 캠퍼스 투어 활동에 관심 있는 학생을 모집합니다. 한국어가 서툴러도 참여할 수 있습니다.',
@@ -53,6 +56,7 @@ export const clubs: Club[] = [
       ja: '言語交換、文化交流、キャンパスツアー活動に関心のある学生を募集します。韓国語が得意でなくても参加できます。',
       zh: '招募对语言交换、文化交流和校园参观活动感兴趣的学生。即使韩语不流利也可以参加。',
       vi: 'Chúng tôi tuyển sinh viên quan tâm đến trao đổi ngôn ngữ, giao lưu văn hóa và tour tham quan khuôn viên. Bạn vẫn có thể tham gia dù tiếng Hàn chưa thành thạo.',
+      fa: 'دانشجویانی را می‌پذیریم که به تبادل زبان، تبادل فرهنگی و تور دانشگاه علاقه‌مند هستند. حتی اگر به زبان کره‌ای مسلط نیستید می‌توانید شرکت کنید.',
     },
     recentActivities: [
       '봄학기 웰컴 파티와 언어 교환 테이블 운영',
@@ -65,6 +69,11 @@ export const clubs: Club[] = [
         'Ran a campus tour for new international students',
         'Joined the Korean/English study fair',
       ],
+      fa: [
+        'برگزاری پارتی خوش‌آمدگویی نیمسال بهار و میزهای تبادل زبان',
+        'اجرای تور دانشگاه برای دانشجویان بین‌المللی جدید',
+        'شرکت در نمایشگاه مطالعه کره‌ای/انگلیسی',
+      ],
     },
   },
   {
@@ -76,10 +85,12 @@ export const clubs: Club[] = [
       '논리적 사고와 설득력 있는 말하기를 연습합니다. 매주 새로운 주제로 열린 토론을 진행합니다.',
     descriptionTranslations: {
       en: 'We practice logical thinking and persuasive speaking through open debates on new topics every week.',
+      fa: 'ما از طریق مناظره‌های آزاد درباره موضوعات جدید هر هفته، تفکر منطقی و سخنرانی متقاعدکننده تمرین می‌کنیم.',
     },
     tagline: '생각을 말로 정리하는 학술 커뮤니티',
     taglineTranslations: {
       en: 'An academic community for turning ideas into clear speech',
+      fa: 'یک جامعه علمی برای تبدیل ایده‌ها به سخنرانی روشن',
     },
     tags: ['Korean', '발표', '모집 중'],
     language: 'ko',
@@ -91,11 +102,13 @@ export const clubs: Club[] = [
     meetingInfo: '매주 목요일 19:00, 인문관 세미나실',
     meetingInfoTranslations: {
       en: 'Every Thursday at 19:00, Humanities Building seminar room',
+      fa: 'هر پنجشنبه ساعت ۱۹:۰۰، اتاق سمینار ساختمان علوم انسانی',
     },
     recruitInfo:
       '발표와 토론을 연습하고 싶은 학생을 모집합니다. 초보자는 기초 스피치 세션부터 함께합니다.',
     recruitInfoTranslations: {
       en: 'We welcome students who want to practice presentations and debates. Beginners can start with basic speech sessions.',
+      fa: 'به دانشجویانی که می‌خواهند ارائه و مناظره تمرین کنند خوشامد می‌گوییم. مبتدیان می‌توانند با جلسات سخنرانی پایه شروع کنند.',
     },
     recentActivities: [
       'AI 윤리 공개 토론회 진행',
@@ -108,6 +121,11 @@ export const clubs: Club[] = [
         'Held a presentation workshop for first-year students',
         'Joined an on-campus presentation contest',
       ],
+      fa: [
+        'برگزاری مناظره عمومی درباره اخلاق هوش مصنوعی',
+        'برگزاری کارگاه ارائه برای دانشجویان سال اول',
+        'شرکت در مسابقه ارائه درون دانشگاهی',
+      ],
     },
   },
   {
@@ -119,10 +137,12 @@ export const clubs: Club[] = [
       '땀 흘리며 스트레스를 날려버릴 신입 회원을 모집합니다. 초보자도 쉽게 배울 수 있습니다.',
     descriptionTranslations: {
       en: 'We welcome new members who want to sweat, play, and relieve stress. Beginners can learn easily.',
+      fa: 'به اعضای جدیدی که می‌خواهند عرق بریزند، بازی کنند و استرس را کاهش دهند خوشامد می‌گوییم. مبتدیان می‌توانند به راحتی یاد بگیرند.',
     },
     tagline: '함께 뛰는 팀 스포츠 동아리',
     taglineTranslations: {
       en: 'A team sports club where we run together',
+      fa: 'یک باشگاه ورزشی تیمی که با هم می‌دویم',
     },
     tags: ['All', '모집 마감'],
     language: 'both',
@@ -134,11 +154,13 @@ export const clubs: Club[] = [
     meetingInfo: '매주 화요일 20:00, 체육관',
     meetingInfoTranslations: {
       en: 'Every Tuesday at 20:00, Gymnasium',
+      fa: 'هر سه‌شنبه ساعت ۲۰:۰۰، سالن ورزشی',
     },
     recruitInfo:
       '현재 정규 모집은 마감되었습니다. 다음 모집 기간에 초보자반과 정규반을 함께 모집할 예정입니다.',
     recruitInfoTranslations: {
       en: 'Regular recruitment is currently closed. Beginner and regular groups will open together in the next recruitment period.',
+      fa: 'پذیرش منظم در حال حاضر بسته است. گروه مبتدیان و منظم در دوره پذیرش بعدی با هم باز خواهند شد.',
     },
     recentActivities: [
       '봄학기 교내 리그 준우승',
@@ -150,6 +172,11 @@ export const clubs: Club[] = [
         'Runner-up in the spring campus league',
         'Hosted a beginner shooting clinic',
         'Played friendly matches with other universities',
+      ],
+      fa: [
+        'نایب‌قهرمانی در لیگ بهاری دانشگاه',
+        'برگزاری کلینیک شوت برای مبتدیان',
+        'بازی دوستانه با دانشگاه‌های دیگر',
       ],
     },
   },
