@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
-export type UiLanguage = 'ko' | 'en' | 'ja' | 'zh' | 'vi';
-export type ContentLanguage = 'en' | 'ja' | 'zh' | 'vi';
+export type UiLanguage = 'ko' | 'en' | 'ja' | 'zh' | 'vi' | 'fa';
+export type ContentLanguage = 'en' | 'ja' | 'zh' | 'vi' | 'fa';
 
 type LanguageState = {
   uiLanguage: UiLanguage;
@@ -18,6 +18,7 @@ export const uiLanguageLabels: Record<UiLanguage, string> = {
   ja: '日本語',
   zh: '中文',
   vi: 'Tiếng Việt',
+  fa: 'فارسی',
 };
 
 export const contentLanguageLabels: Record<ContentLanguage, string> = {
@@ -25,6 +26,7 @@ export const contentLanguageLabels: Record<ContentLanguage, string> = {
   ja: '日本語',
   zh: '中文',
   vi: 'Tiếng Việt',
+  fa: 'فارسی',
 };
 
 export const useLanguageStore = create<LanguageState>((set) => ({
