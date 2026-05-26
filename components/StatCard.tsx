@@ -1,22 +1,28 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '@/constants/theme';
 
 type StatCardProps = {
   icon: keyof typeof MaterialIcons.glyphMap;
   label: string;
   value: string;
+  onPress?: () => void;
 };
 
-export function StatCard({ icon, label, value }: StatCardProps) {
+export function StatCard({ icon, label, value, onPress }: StatCardProps) {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.85}
+      disabled={!onPress}
+      onPress={onPress}
+    >
       <View style={styles.icon}>
         <MaterialIcons name={icon} size={22} color={colors.navyDeep} />
       </View>
       <Text style={styles.value}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 

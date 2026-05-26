@@ -229,6 +229,10 @@ export const notifications: Notification[] = [
     type: 'APPLICATION_STATUS',
     title: '지원서 상태 변경',
     body: '글로벌 시민 지원서가 검토 중으로 변경되었습니다.',
+    detail:
+      '글로벌 시민 회장이 지원서를 확인하기 시작했습니다. 검토가 완료되면 합격 또는 불합격 알림이 다시 전달됩니다.',
+    actionLabel: '지원내역 보기',
+    actionHref: '/(tabs)/applications',
     createdAt: '방금 전',
     isRead: false,
   },
@@ -237,6 +241,10 @@ export const notifications: Notification[] = [
     type: 'ADMIN_APPROVAL',
     title: '권한 승인 안내',
     body: '운영자 승인 요청이 접수되었습니다.',
+    detail:
+      '운영자 권한 신청이 접수되었습니다. 학교 관리자 또는 기존 운영자가 승인하면 관리자 대시보드 접근 권한이 활성화됩니다.',
+    actionLabel: '마이페이지 보기',
+    actionHref: '/(tabs)/profile',
     createdAt: '2시간 전',
     isRead: false,
   },
@@ -245,6 +253,10 @@ export const notifications: Notification[] = [
     type: 'NOTICE',
     title: '새 공지사항',
     body: '2026년 1학기 글로벌 멘토링 프로그램 안내',
+    detail:
+      '글로벌 멘토링 프로그램은 내국인 학생과 유학생이 함께 교류하는 활동입니다. 자세한 모집 내용은 동아리 상세 페이지에서 확인할 수 있습니다.',
+    actionLabel: '동아리 상세 보기',
+    actionHref: '/club/global-citizens',
     createdAt: '어제',
     isRead: true,
   },

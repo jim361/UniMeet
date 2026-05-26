@@ -72,6 +72,9 @@ export type Notification = {
   type: 'APPLICATION_STATUS' | 'ADMIN_APPROVAL' | 'NOTICE' | 'SYSTEM';
   title: string;
   body: string;
+  detail: string;
+  actionLabel?: string;
+  actionHref?: string;
   createdAt: string;
   isRead: boolean;
 };

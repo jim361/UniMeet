@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/AppHeader';
@@ -8,12 +8,15 @@ import { ClubCard } from '@/components/ClubCard';
 import { Section } from '@/components/Section';
 import { StatCard } from '@/components/StatCard';
 import { colors } from '@/constants/theme';
-import { clubs, currentUser, myApplications, notifications } from '@/data/mock';
+import { clubs, currentUser, myApplications } from '@/data/mock';
+import { useNotificationStore } from '@/store/notificationStore';
 import { statusLabel } from '@/utils/status';
 
 export default function HomeScreen() {
-  const unreadCount = notifications.filter((item) => !item.isRead).length;
+  const router = useRouter();
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
   const activeApplications = myApplications.slice(0, 2);
+  const myClubs = clubs.slice(0, 2);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -38,9 +41,24 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.statsRow}>
-          <StatCard icon="groups" label="내 동아리" value="2" />
-          <StatCard icon="assignment" label="지원서" value={`${myApplications.length}`} />
-          <StatCard icon="notifications" label="안 읽음" value={`${unreadCount}`} />
+          <StatCard
+            icon="groups"
+            label="내 동아리"
+            value={`${myClubs.length}`}
+            onPress={() => router.push('/my-clubs')}
+          />
+          <StatCard
+            icon="assignment"
+            label="지원서"
+            value={`${myApplications.length}`}
+            onPress={() => router.push('/(tabs)/applications')}
+          />
+          <StatCard
+            icon="notifications"
+            label="안 읽음"
+            value={`${unreadCount}`}
+            onPress={() => router.push('/(tabs)/notifications')}
+          />
         </View>
 
         <Section title="지원 상태">
@@ -48,13 +66,18 @@ export default function HomeScreen() {
             {activeApplications.map((application) => {
               const club = clubs.find((item) => item.id === application.clubId);
               return (
-                <View key={application.id} style={styles.statusCard}>
+                <TouchableOpacity
+                  key={application.id}
+                  style={styles.statusCard}
+                  activeOpacity={0.85}
+                  onPress={() => router.push('/(tabs)/applications')}
+                >
                   <View>
                     <Text style={styles.statusClub}>{club?.name}</Text>
                     <Text style={styles.statusDate}>{application.submittedAt} 제출</Text>
                   </View>
                   <Badge label={statusLabel(application.status)} tone="gold" />
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
