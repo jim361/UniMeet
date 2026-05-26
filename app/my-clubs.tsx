@@ -12,7 +12,7 @@ export default function MyClubsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="내 동아리" subtitle="가입했거나 관리 중인 동아리" showBell={false} />
+      <AppHeader title="내 동아리" subtitle="가입했거나 관리 중인 동아리" showBell={false} showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.summary}>
           <Text style={styles.summaryTitle}>현재 {myClubs.length}개 동아리에 연결되어 있어요.</Text>

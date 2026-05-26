@@ -15,7 +15,7 @@ export default function LeaderDashboardScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="회장 대시보드" subtitle={club.name} />
+      <AppHeader title="회장 대시보드" subtitle={club.name} showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.statsRow}>
           <StatCard icon="person-search" label="신규 지원자" value={`${leaderApplications.length}`} />

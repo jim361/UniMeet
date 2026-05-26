@@ -23,7 +23,7 @@ export default function NotificationDetailScreen() {
   if (!notification) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <AppHeader title="알림 상세" showBell={false} />
+        <AppHeader title="알림 상세" showBell={false} showBack />
         <View style={styles.missing}>
           <EmptyState
             icon="notifications-off"
@@ -37,7 +37,7 @@ export default function NotificationDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="알림 상세" subtitle={notification.createdAt} showBell={false} />
+      <AppHeader title="알림 상세" subtitle={notification.createdAt} showBell={false} showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <View style={styles.icon}>

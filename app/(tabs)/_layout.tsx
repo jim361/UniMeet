@@ -4,7 +4,7 @@ import { colors } from '@/constants/theme';
 import { useT } from '@/utils/i18n';
 
 const tabIcons = {
-  index: 'home',
+  home: 'home',
   explore: 'explore',
   applications: 'assignment',
   notifications: 'notifications-none',
@@ -37,7 +37,7 @@ export default function TabLayout() {
         },
       })}
     >
-      <Tabs.Screen name="index" options={{ title: t('home') }} />
+      <Tabs.Screen name="home" options={{ title: t('home') }} />
       <Tabs.Screen name="explore" options={{ title: t('explore') }} />
       <Tabs.Screen name="applications" options={{ title: t('applications') }} />
       <Tabs.Screen name="notifications" options={{ title: t('notifications') }} />

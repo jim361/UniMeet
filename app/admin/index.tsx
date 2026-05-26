@@ -18,7 +18,7 @@ const auditItems = [
 export default function AdminDashboardScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="관리자 대시보드" subtitle="운영자/학교 관리자용 모바일 관리" />
+      <AppHeader title="관리자 대시보드" subtitle="운영자/학교 관리자용 모바일 관리" showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.statsRow}>
           <StatCard icon="school" label="동아리" value={`${clubs.length}`} />

@@ -47,6 +47,14 @@ export default function ClubDetailScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.imageWrap}>
+          <TouchableOpacity
+            style={styles.backButton}
+            accessibilityLabel="뒤로가기"
+            activeOpacity={0.78}
+            onPress={() => router.back()}
+          >
+            <MaterialIcons name="arrow-back-ios-new" size={20} color={colors.navyDeep} />
+          </TouchableOpacity>
           <Image source={{ uri: club.imageUrl }} style={styles.heroImage} />
           <View style={styles.imageOverlay}>
             <Badge label={club.category} tone="gold" />
@@ -223,6 +231,18 @@ const styles = StyleSheet.create({
   content: { paddingBottom: 28 },
   missing: { flex: 1, padding: 16 },
   imageWrap: { height: 300, position: 'relative' },
+  backButton: {
+    alignItems: 'center',
+    backgroundColor: colors.canvas,
+    borderRadius: 999,
+    height: 42,
+    justifyContent: 'center',
+    left: 16,
+    position: 'absolute',
+    top: 16,
+    width: 42,
+    zIndex: 4,
+  },
   heroImage: { height: '100%', width: '100%' },
   imageOverlay: {
     backgroundColor: 'rgba(26,46,90,0.48)',

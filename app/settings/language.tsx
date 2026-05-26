@@ -42,7 +42,7 @@ export default function LanguageSettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title={t('languageSettings')} subtitle={t('languageSettingsSubtitle')} showBell={false} />
+      <AppHeader title={t('languageSettings')} subtitle={t('languageSettingsSubtitle')} showBell={false} showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.note}>
           <MaterialIcons name="translate" size={22} color={colors.navyDeep} />

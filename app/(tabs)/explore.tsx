@@ -8,22 +8,25 @@ import { EmptyState } from '@/components/EmptyState';
 import { colors } from '@/constants/theme';
 import { clubs } from '@/data/mock';
 
-const filters = ['전체', '모집 중', '문화', '학술', '체육', '한/영'];
+const filters = ['전체', '모집 중', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'];
 
 export default function ExploreScreen() {
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('전체');
 
   const filteredClubs = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
     return clubs.filter((club) => {
       const matchedQuery =
-        club.name.includes(query) ||
-        club.englishName.toLowerCase().includes(query.toLowerCase()) ||
-        club.description.includes(query);
+        !normalizedQuery ||
+        club.name.toLowerCase().includes(normalizedQuery) ||
+        club.englishName.toLowerCase().includes(normalizedQuery) ||
+        club.description.toLowerCase().includes(normalizedQuery) ||
+        club.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery));
       const matchedFilter =
         activeFilter === '전체' ||
         (activeFilter === '모집 중' && club.isRecruiting) ||
-        (activeFilter === '한/영' && club.language === 'both') ||
         club.category === activeFilter;
 
       return matchedQuery && matchedFilter;
@@ -32,7 +35,7 @@ export default function ExploreScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="탐색" subtitle="홍보카드로 동아리를 찾아보세요" />
+      <AppHeader title="탐색" subtitle="실제 선문대학교 동아리를 찾아보세요" />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.searchBox}>
           <MaterialIcons name="search" size={22} color={colors.inkMuted} />
@@ -63,6 +66,10 @@ export default function ExploreScreen() {
             );
           })}
         </ScrollView>
+
+        <View style={styles.countRow}>
+          <Text style={styles.countText}>총 {filteredClubs.length}개 동아리</Text>
+        </View>
 
         <View style={styles.list}>
           {filteredClubs.length > 0 ? (
@@ -96,7 +103,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   searchInput: { color: colors.ink, flex: 1, fontSize: 15 },
-  filterRow: { gap: 8, paddingHorizontal: 16, paddingBottom: 18 },
+  filterRow: { gap: 8, paddingHorizontal: 16, paddingBottom: 12 },
   filterChip: {
     backgroundColor: colors.canvas,
     borderColor: colors.border,
@@ -108,5 +115,7 @@ const styles = StyleSheet.create({
   filterChipActive: { backgroundColor: colors.navyDeep, borderColor: colors.navyDeep },
   filterText: { color: colors.inkMuted, fontSize: 14, fontWeight: '800' },
   filterTextActive: { color: colors.canvas },
+  countRow: { paddingHorizontal: 18, paddingBottom: 12 },
+  countText: { color: colors.inkMuted, fontSize: 13, fontWeight: '800' },
   list: { gap: 14, paddingHorizontal: 16 },
 });

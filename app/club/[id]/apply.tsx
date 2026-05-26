@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppHeader } from '@/components/AppHeader';
 import { Badge } from '@/components/Badge';
 import { colors } from '@/constants/theme';
 import { applicationFields, clubs, currentUser } from '@/data/mock';
@@ -12,6 +13,7 @@ export default function ApplyScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <AppHeader title="지원서 작성" subtitle={club?.name} showBell={false} showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.kicker}>Application Form</Text>

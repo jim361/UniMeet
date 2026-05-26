@@ -20,7 +20,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="UniMeet" subtitle="선문대 동아리 통합 플랫폼" />
+      <AppHeader title="UniMeet" subtitle="동아리 통합 플랫폼" />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.hero}>
           <Text style={styles.greeting}>안녕하세요, {currentUser.name}님</Text>

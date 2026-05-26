@@ -24,7 +24,7 @@ export function ClubCard({ club }: ClubCardProps) {
       activeOpacity={0.88}
       onPress={() => router.push({ pathname: '/club/[id]', params: { id: club.id } })}
     >
-      <Image source={{ uri: club.imageUrl }} style={styles.image} />
+      <Image source={{ uri: club.imageUrl }} style={styles.image} resizeMode="cover" />
       <View style={styles.body}>
         <View style={styles.titleRow}>
           <View style={styles.titleBlock}>
@@ -56,7 +56,8 @@ const styles = StyleSheet.create({
     ...shadow,
   },
   image: {
-    height: 164,
+    backgroundColor: colors.surfaceSoft,
+    height: 184,
     width: '100%',
   },
   body: {
