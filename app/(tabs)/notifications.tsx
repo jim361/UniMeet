@@ -8,49 +8,22 @@ import {
   StyleSheet,
 } from "react-native";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useUserStore } from "@/store/userStore";
-import { AppNotification } from "@/types/clubApplication";
-
-const ICON: Record<string, string> = {
-  APPLICATION_APPROVED: "🎉",
-  APPLICATION_REJECTED: "😔",
-  NEW_APPLICATION: "📋",
-};
+import { currentUser } from "@/data/mock";
 
 export default function NotificationsScreen() {
-  const { currentUser } = useUserStore();
   const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
 
   const myNotifications = notifications.filter(
-    (n) => n.userId === currentUser?.id
+    (n) => n.userId === currentUser.id
   );
 
   const unreadCount = myNotifications.filter((n) => !n.isRead).length;
 
-  const renderItem = ({ item }: { item: AppNotification }) => (
-    <TouchableOpacity
-      style={[styles.card, !item.isRead && styles.unreadCard]}
-      onPress={() => markAsRead(item.id)}
-      activeOpacity={0.8}
-    >
-      <Text style={styles.icon}>{ICON[item.type] ?? "🔔"}</Text>
-      <View style={styles.content}>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>{item.title}</Text>
-          {!item.isRead && <View style={styles.dot} />}
-        </View>
-        <Text style={styles.message}>{item.message}</Text>
-        <Text style={styles.time}>
-          {new Date(item.createdAt).toLocaleString("ko-KR", {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const ICON: Record<string, string> = {
+    APPLICATION_APPROVED: "🎉",
+    APPLICATION_REJECTED: "😔",
+    NEW_APPLICATION: "📋",
+  };
 
   return (
     <View style={styles.container}>
@@ -68,7 +41,30 @@ export default function NotificationsScreen() {
       <FlatList
         data={myNotifications}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[styles.card, !item.isRead && styles.unreadCard]}
+            onPress={() => markAsRead(item.id)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.icon}>{ICON[item.type] ?? "🔔"}</Text>
+            <View style={styles.content}>
+              <View style={styles.titleRow}>
+                <Text style={styles.title}>{item.title}</Text>
+                {!item.isRead && <View style={styles.dot} />}
+              </View>
+              <Text style={styles.message}>{item.message}</Text>
+              <Text style={styles.time}>
+                {new Date(item.createdAt).toLocaleString("ko-KR", {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -108,10 +104,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  unreadCard: {
-    borderLeftWidth: 3,
-    borderLeftColor: "#4f46e5",
-  },
+  unreadCard: { borderLeftWidth: 3, borderLeftColor: "#4f46e5" },
   icon: { fontSize: 28, marginTop: 2 },
   content: { flex: 1 },
   titleRow: {
@@ -121,12 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   title: { fontSize: 15, fontWeight: "700", color: "#1a1a2e" },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#4f46e5",
-  },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#4f46e5" },
   message: { fontSize: 13, color: "#555", lineHeight: 18, marginBottom: 6 },
   time: { fontSize: 11, color: "#aaa" },
   empty: { alignItems: "center", paddingTop: 80 },
