@@ -1,18 +1,36 @@
-// store/clubApplicationStore.ts
 import { create } from "zustand";
-import { ClubApplication, ApplicationStatus } from "@/types/clubApplication";
 import { useNotificationStore } from "@/store/notificationStore";
+
+export type ApplicationStatus = "pending" | "approved" | "rejected";
+
+export interface ClubApplication {
+  id: string;
+  clubId: string;
+  clubName: string;
+  applicantId: string;
+  applicantName: string;
+  applicantEmail: string;
+  motivation: string;
+  experience?: string;
+  availability?: string;
+  status: ApplicationStatus;
+  appliedAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+}
 
 interface ClubApplicationState {
   applications: ClubApplication[];
-
-  submitApplication: (
-    payload: Omit
-      ClubApplication,
-      "id" | "appliedAt" | "status" | "reviewedAt" | "reviewedBy"
-    >
-  ) => ClubApplication;
-
+  submitApplication: (payload: {
+    clubId: string;
+    clubName: string;
+    applicantId: string;
+    applicantName: string;
+    applicantEmail: string;
+    motivation: string;
+    experience?: string;
+    availability?: string;
+  }) => ClubApplication;
   getApplicationsByClub: (clubId: string) => ClubApplication[];
   approveApplication: (applicationId: string, adminId: string) => void;
   rejectApplication: (applicationId: string, adminId: string) => void;
@@ -27,16 +45,13 @@ export const useClubApplicationStore = create<ClubApplicationState>(
     submitApplication: (payload) => {
       const newApp: ClubApplication = {
         ...payload,
-        id: `app_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        id: `app_${Date.now()}`,
         status: "pending",
         appliedAt: new Date().toISOString(),
       };
-
       set((state) => ({
         applications: [newApp, ...state.applications],
       }));
-
-      // 관리자에게 알림 전송
       useNotificationStore.getState().addNotification({
         userId: `admin_${payload.clubId}`,
         type: "NEW_APPLICATION",
@@ -46,7 +61,6 @@ export const useClubApplicationStore = create<ClubApplicationState>(
         clubName: payload.clubName,
         applicationId: newApp.id,
       });
-
       return newApp;
     },
 
@@ -57,7 +71,6 @@ export const useClubApplicationStore = create<ClubApplicationState>(
     approveApplication: (applicationId, adminId) => {
       const app = get().applications.find((a) => a.id === applicationId);
       if (!app || app.status !== "pending") return;
-
       set((state) => ({
         applications: state.applications.map((a) =>
           a.id === applicationId
@@ -70,8 +83,6 @@ export const useClubApplicationStore = create<ClubApplicationState>(
             : a
         ),
       }));
-
-      // ✅ 승인 알림
       useNotificationStore.getState().addNotification({
         userId: app.applicantId,
         type: "APPLICATION_APPROVED",
@@ -86,7 +97,6 @@ export const useClubApplicationStore = create<ClubApplicationState>(
     rejectApplication: (applicationId, adminId) => {
       const app = get().applications.find((a) => a.id === applicationId);
       if (!app || app.status !== "pending") return;
-
       set((state) => ({
         applications: state.applications.map((a) =>
           a.id === applicationId
@@ -99,8 +109,6 @@ export const useClubApplicationStore = create<ClubApplicationState>(
             : a
         ),
       }));
-
-      // ❌ 거절 알림
       useNotificationStore.getState().addNotification({
         userId: app.applicantId,
         type: "APPLICATION_REJECTED",
