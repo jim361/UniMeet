@@ -9,9 +9,8 @@ import {
   Alert,
   RefreshControl,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
 import { useClubApplicationStore } from "@/store/clubApplicationStore";
-import { useUserStore } from "@/store/userStore";
+import { currentUser } from "@/data/mock";
 import { ClubApplication } from "@/types/clubApplication";
 
 const STATUS_COLOR: Record<string, string> = {
@@ -27,13 +26,10 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function AdminApplicationsScreen() {
-  const { clubId } = useLocalSearchParams<{ clubId: string }>();
-  const { currentUser } = useUserStore();
-  const { getApplicationsByClub, approveApplication, rejectApplication } =
+  const { applications, approveApplication, rejectApplication } =
     useClubApplicationStore();
 
   const [refreshing, setRefreshing] = useState(false);
-  const applications = getApplicationsByClub(clubId ?? "");
 
   const handleApprove = (app: ClubApplication) => {
     Alert.alert(
@@ -43,7 +39,8 @@ export default function AdminApplicationsScreen() {
         { text: "취소", style: "cancel" },
         {
           text: "승인",
-          onPress: () => approveApplication(app.id, currentUser?.id ?? "admin"),
+          onPress: () =>
+            approveApplication(app.id, currentUser.id),
         },
       ]
     );
@@ -58,72 +55,12 @@ export default function AdminApplicationsScreen() {
         {
           text: "거절",
           style: "destructive",
-          onPress: () => rejectApplication(app.id, currentUser?.id ?? "admin"),
+          onPress: () =>
+            rejectApplication(app.id, currentUser.id),
         },
       ]
     );
   };
-
-  const renderItem = ({ item }: { item: ClubApplication }) => (
-    <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View>
-          <Text style={styles.applicantName}>{item.applicantName}</Text>
-          <Text style={styles.applicantEmail}>{item.applicantEmail}</Text>
-        </View>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: STATUS_COLOR[item.status] + "20" },
-          ]}
-        >
-          <Text style={[styles.statusText, { color: STATUS_COLOR[item.status] }]}>
-            {STATUS_LABEL[item.status]}
-          </Text>
-        </View>
-      </View>
-
-      <Text style={styles.date}>
-        신청일: {new Date(item.appliedAt).toLocaleDateString("ko-KR")}
-      </Text>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>지원 동기</Text>
-        <Text style={styles.sectionContent}>{item.motivation}</Text>
-      </View>
-
-      {!!item.experience && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>관련 경험</Text>
-          <Text style={styles.sectionContent}>{item.experience}</Text>
-        </View>
-      )}
-
-      {!!item.availability && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>활동 가능 시간</Text>
-          <Text style={styles.sectionContent}>{item.availability}</Text>
-        </View>
-      )}
-
-      {item.status === "pending" && (
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={styles.rejectButton}
-            onPress={() => handleReject(item)}
-          >
-            <Text style={styles.rejectText}>❌ 거절</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.approveButton}
-            onPress={() => handleApprove(item)}
-          >
-            <Text style={styles.approveText}>✅ 승인</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -136,19 +73,83 @@ export default function AdminApplicationsScreen() {
       <FlatList
         data={applications}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>신청서가 없습니다.</Text>
-          </View>
-        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => setRefreshing(false)}
           />
         }
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>신청서가 없습니다.</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View>
+                <Text style={styles.applicantName}>{item.applicantName}</Text>
+                <Text style={styles.applicantEmail}>{item.applicantEmail}</Text>
+              </View>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: STATUS_COLOR[item.status] + "20" },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusText,
+                    { color: STATUS_COLOR[item.status] },
+                  ]}
+                >
+                  {STATUS_LABEL[item.status]}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.date}>
+              신청일: {new Date(item.appliedAt).toLocaleDateString("ko-KR")}
+            </Text>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>지원 동기</Text>
+              <Text style={styles.sectionContent}>{item.motivation}</Text>
+            </View>
+
+            {!!item.experience && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>관련 경험</Text>
+                <Text style={styles.sectionContent}>{item.experience}</Text>
+              </View>
+            )}
+
+            {!!item.availability && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>활동 가능 시간</Text>
+                <Text style={styles.sectionContent}>{item.availability}</Text>
+              </View>
+            )}
+
+            {item.status === "pending" && (
+              <View style={styles.actionRow}>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={() => handleReject(item)}
+                >
+                  <Text style={styles.rejectText}>❌ 거절</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.approveButton}
+                  onPress={() => handleApprove(item)}
+                >
+                  <Text style={styles.approveText}>✅ 승인</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
       />
     </View>
   );
@@ -189,15 +190,16 @@ const styles = StyleSheet.create({
   },
   applicantName: { fontSize: 16, fontWeight: "700", color: "#1a1a2e" },
   applicantEmail: { fontSize: 12, color: "#888", marginTop: 2 },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   statusText: { fontSize: 12, fontWeight: "600" },
   date: { fontSize: 12, color: "#aaa", marginBottom: 12 },
   section: { marginBottom: 10 },
-  sectionTitle: { fontSize: 12, fontWeight: "600", color: "#666", marginBottom: 4 },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#666",
+    marginBottom: 4,
+  },
   sectionContent: { fontSize: 14, color: "#333", lineHeight: 20 },
   actionRow: {
     flexDirection: "row",
