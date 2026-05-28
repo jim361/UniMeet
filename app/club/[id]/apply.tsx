@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useClubApplicationStore } from "@/store/clubApplicationStore";
-import { useUserStore } from "@/store/userStore";
+import { currentUser } from "@/data/mock";
 
 export default function ClubApplyScreen() {
   const { id: clubId, name: clubName } = useLocalSearchParams<{
@@ -20,7 +20,6 @@ export default function ClubApplyScreen() {
     name: string;
   }>();
   const router = useRouter();
-  const { currentUser } = useUserStore();
   const { submitApplication, hasApplied } = useClubApplicationStore();
 
   const [motivation, setMotivation] = useState("");
@@ -28,14 +27,13 @@ export default function ClubApplyScreen() {
   const [availability, setAvailability] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const alreadyApplied = hasApplied(currentUser?.id ?? "", clubId ?? "");
+  const alreadyApplied = hasApplied(currentUser.id, clubId ?? "");
 
   const handleSubmit = async () => {
     if (!motivation.trim()) {
       Alert.alert("알림", "지원 동기를 입력해 주세요.");
       return;
     }
-    if (!currentUser) return;
 
     setSubmitting(true);
     try {
@@ -66,7 +64,10 @@ export default function ClubApplyScreen() {
         <Text style={styles.alreadyAppliedText}>
           이미 가입 신청서를 제출하셨습니다.{"\n"}심사 결과를 기다려 주세요.
         </Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
           <Text style={styles.backButtonText}>돌아가기</Text>
         </TouchableOpacity>
       </View>
@@ -134,7 +135,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 32,
   },
-  header: { fontSize: 22, fontWeight: "700", marginBottom: 24, color: "#1a1a2e" },
+  header: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 24,
+    color: "#1a1a2e",
+  },
   label: { fontSize: 14, fontWeight: "600", color: "#333", marginBottom: 6 },
   required: { color: "#e74c3c" },
   input: {
