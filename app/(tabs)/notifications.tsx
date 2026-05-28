@@ -1,154 +1,134 @@
-import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader } from '@/components/AppHeader';
-import { EmptyState } from '@/components/EmptyState';
-import { colors } from '@/constants/theme';
-import { useNotificationStore } from '@/store/notificationStore';
+// app/(tabs)/notifications.tsx
+import React from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import { useNotificationStore } from "@/store/notificationStore";
+import { useUserStore } from "@/store/userStore";
+import { AppNotification } from "@/types/clubApplication";
 
-const iconByType = {
-  APPLICATION_STATUS: 'check-circle',
-  ADMIN_APPROVAL: 'verified-user',
-  NOTICE: 'campaign',
-  SYSTEM: 'info',
-} as const;
+const ICON: Record<string, string> = {
+  APPLICATION_APPROVED: "🎉",
+  APPLICATION_REJECTED: "😔",
+  NEW_APPLICATION: "📋",
+};
 
 export default function NotificationsScreen() {
-  const router = useRouter();
-  const [filter, setFilter] = useState<'unread' | 'all'>('unread');
-  const { notifications, markAllAsRead, markAsRead } = useNotificationStore();
-  const unreadCount = notifications.filter((notification) => !notification.isRead).length;
-  const visibleNotifications =
-    filter === 'unread'
-      ? notifications.filter((notification) => !notification.isRead)
-      : notifications;
+  const { currentUser } = useUserStore();
+  const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
+
+  const myNotifications = notifications.filter(
+    (n) => n.userId === currentUser?.id
+  );
+
+  const unreadCount = myNotifications.filter((n) => !n.isRead).length;
+
+  const renderItem = ({ item }: { item: AppNotification }) => (
+    <TouchableOpacity
+      style={[styles.card, !item.isRead && styles.unreadCard]}
+      onPress={() => markAsRead(item.id)}
+      activeOpacity={0.8}
+    >
+      <Text style={styles.icon}>{ICON[item.type] ?? "🔔"}</Text>
+      <View style={styles.content}>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{item.title}</Text>
+          {!item.isRead && <View style={styles.dot} />}
+        </View>
+        <Text style={styles.message}>{item.message}</Text>
+        <Text style={styles.time}>
+          {new Date(item.createdAt).toLocaleString("ko-KR", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="알림" subtitle="앱 내부 알림함" showBell={false} />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.topRow}>
-          <Text style={styles.sectionLabel}>
-            {filter === 'unread' ? `안 읽음 ${unreadCount}개` : '전체 알림'}
-          </Text>
-          <TouchableOpacity onPress={markAllAsRead} disabled={unreadCount === 0}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>
+          알림{unreadCount > 0 ? ` (${unreadCount})` : ""}
+        </Text>
+        {unreadCount > 0 && (
+          <TouchableOpacity onPress={markAllAsRead}>
             <Text style={styles.markAll}>모두 읽음</Text>
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.filterRow}>
-          <TouchableOpacity
-            style={[styles.filterChip, filter === 'unread' && styles.filterChipActive]}
-            onPress={() => setFilter('unread')}
-          >
-            <Text style={[styles.filterText, filter === 'unread' && styles.filterTextActive]}>
-              안 읽음
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
-            onPress={() => setFilter('all')}
-          >
-            <Text style={[styles.filterText, filter === 'all' && styles.filterTextActive]}>
-              전체
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {visibleNotifications.length > 0 ? (
-          visibleNotifications.map((notification) => (
-            <TouchableOpacity
-              key={notification.id}
-              style={[styles.card, !notification.isRead && styles.unreadCard]}
-              activeOpacity={0.85}
-              onPress={() => {
-                markAsRead(notification.id);
-                router.push({ pathname: '/notifications/[id]', params: { id: notification.id } });
-              }}
-            >
-              <View style={[styles.icon, !notification.isRead && styles.unreadIcon]}>
-                <MaterialIcons
-                  name={iconByType[notification.type]}
-                  size={24}
-                  color={!notification.isRead ? colors.canvas : colors.inkMuted}
-                />
-              </View>
-              <View style={styles.body}>
-                <View style={styles.titleRow}>
-                  <Text style={styles.title}>{notification.title}</Text>
-                  <Text style={styles.time}>{notification.createdAt}</Text>
-                </View>
-                <Text style={styles.message}>{notification.body}</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <EmptyState
-            icon="notifications-none"
-            title="안 읽은 알림이 없어요"
-            body="전체 탭에서 지난 알림을 다시 확인할 수 있습니다."
-          />
         )}
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+
+      <FlatList
+        data={myNotifications}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>알림이 없습니다.</Text>
+          </View>
+        }
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: colors.surface, flex: 1 },
-  content: { gap: 12, padding: 16, paddingBottom: 28 },
-  topRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 2,
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
   },
-  sectionLabel: { color: colors.inkMuted, fontSize: 15, fontWeight: '900' },
-  markAll: { color: colors.navy, fontSize: 14, fontWeight: '900' },
-  filterRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  filterChip: {
-    backgroundColor: colors.canvas,
-    borderColor: colors.border,
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  filterChipActive: { backgroundColor: colors.navyDeep, borderColor: colors.navyDeep },
-  filterText: { color: colors.inkMuted, fontSize: 13, fontWeight: '900' },
-  filterTextActive: { color: colors.canvas },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#1a1a2e" },
+  markAll: { fontSize: 13, color: "#4f46e5", fontWeight: "600" },
+  list: { padding: 16, gap: 10 },
   card: {
-    alignItems: 'flex-start',
-    backgroundColor: colors.canvas,
-    borderColor: colors.borderSoft,
+    flexDirection: "row",
+    backgroundColor: "#fff",
     borderRadius: 14,
-    borderWidth: 1,
-    flexDirection: 'row',
+    padding: 14,
     gap: 12,
-    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  unreadCard: { backgroundColor: colors.surfaceWarm, borderColor: colors.goldPale },
-  icon: {
-    alignItems: 'center',
-    backgroundColor: colors.surfaceSoft,
-    borderRadius: 24,
-    height: 48,
-    justifyContent: 'center',
-    width: 48,
+  unreadCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: "#4f46e5",
   },
-  unreadIcon: { backgroundColor: colors.navyDeep },
-  body: { flex: 1, gap: 6 },
+  icon: { fontSize: 28, marginTop: 2 },
+  content: { flex: 1 },
   titleRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 4,
   },
-  title: { color: colors.inkDeep, flex: 1, fontSize: 16, fontWeight: '900' },
-  time: { color: colors.inkMuted, fontSize: 12, marginLeft: 8 },
-  message: { color: colors.ink, fontSize: 14, lineHeight: 20 },
+  title: { fontSize: 15, fontWeight: "700", color: "#1a1a2e" },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#4f46e5",
+  },
+  message: { fontSize: 13, color: "#555", lineHeight: 18, marginBottom: 6 },
+  time: { fontSize: 11, color: "#aaa" },
+  empty: { alignItems: "center", paddingTop: 80 },
+  emptyText: { color: "#aaa", fontSize: 15 },
 });
