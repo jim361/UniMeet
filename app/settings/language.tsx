@@ -116,11 +116,11 @@ function LanguageRow({
   active: boolean;
   onPress: () => void;
 }) {
-  return (
+return (
     <TouchableOpacity style={styles.languageRow} onPress={onPress}>
       <View style={styles.languageText}>
-        <Text style={styles.languageTitle}>{title}</Text>
-        <Text style={styles.languageDescription}>{description}</Text>
+        <Text style={[styles.languageTitle, { writingDirection: 'ltr', textAlign: 'left' }]}>{title}</Text>
+        <Text style={[styles.languageDescription, { writingDirection: 'ltr', textAlign: 'left' }]}>{description}</Text>
       </View>
       <View style={[styles.radio, active && styles.radioActive]}>
         {active ? <MaterialIcons name="check" size={16} color={colors.canvas} /> : null}
