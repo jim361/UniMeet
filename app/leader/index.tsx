@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/AppHeader';
 import { Badge } from '@/components/Badge';
@@ -15,28 +15,23 @@ import { statusLabel } from '@/utils/status';
 export default function LeaderDashboardScreen() {
   const club = clubs[0];
 
-  // ✅ 수정: store에서 직접 구독 (리렌더링 보장)
   const leaderApplications = useApplicationStore((state) => state.leaderApplications);
   const decideApplication = useApplicationStore((state) => state.decideApplication);
   const sendApplicationResult = useNotificationStore((state) => state.sendApplicationResult);
 
   const handleDecide = (applicationId: string, status: 'ACCEPTED' | 'REJECTED') => {
-    // ✅ 수정: Alert으로 확인 후 처리
     const label = status === 'ACCEPTED' ? '합격' : '불합격';
-    Alert.alert(
-      `${label} 처리`,
-      `이 지원자를 ${label} 처리하시겠습니까?`,
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '확인',
-          onPress: () => {
-            decideApplication(applicationId, status);
-            sendApplicationResult(club.name, status);
-          },
-        },
-      ]
-    );
+
+    // ✅ 웹/앱 모두 대응
+    const confirmed =
+      Platform.OS === 'web'
+        ? window.confirm(`이 지원자를 ${label} 처리하시겠습니까?`)
+        : true;
+
+    if (confirmed) {
+      decideApplication(applicationId, status);
+      sendApplicationResult(club.name, status);
+    }
   };
 
   return (
