@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Badge } from '@/components/Badge';
 import { colors, shadow } from '@/constants/theme';
+import { useLanguageStore } from '@/store/languageStore';
 import { Club } from '@/types';
 
 type ClubCardProps = {
@@ -11,6 +12,17 @@ type ClubCardProps = {
 
 export function ClubCard({ club }: ClubCardProps) {
   const router = useRouter();
+  const { uiLanguage, contentLanguage, contentTranslationEnabled } = useLanguageStore();
+
+  // 언어에 따라 동아리 이름 표시
+  const displayName = uiLanguage === 'ko' ? club.name : (club.englishName || club.name);
+
+  // 콘텐츠 번역이 켜져 있으면 번역된 설명, 아니면 원문
+  const displayDescription =
+    contentTranslationEnabled && contentLanguage !== 'ko'
+      ? club.descriptionTranslations?.[contentLanguage as 'en' | 'ja' | 'zh' | 'vi'] || club.description
+      : club.description;
+
   const badgeLabel =
     club.safetyBadgeStatus === 'VERIFIED'
       ? '검토 완료'
@@ -28,13 +40,13 @@ export function ClubCard({ club }: ClubCardProps) {
       <View style={styles.body}>
         <View style={styles.titleRow}>
           <View style={styles.titleBlock}>
-            <Text style={styles.title}>{club.name}</Text>
+            <Text style={styles.title}>{displayName}</Text>
             <Text style={styles.subtitle}>{club.englishName}</Text>
           </View>
           <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
         </View>
         <Text style={styles.description} numberOfLines={2}>
-          {club.description}
+          {displayDescription}
         </Text>
         <View style={styles.badgeRow}>
           <Badge label={club.category} tone="gold" />
