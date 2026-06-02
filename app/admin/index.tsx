@@ -28,16 +28,18 @@ export default function AdminDashboardScreen() {
 
         <Section title="운영 작업">
           <View style={styles.actionList}>
-            <TouchableOpacity style={styles.actionRow}>
-              <View style={styles.iconBox}>
-                <MaterialIcons name="add-business" size={22} color={colors.navyDeep} />
-              </View>
-              <View style={styles.actionText}>
-                <Text style={styles.actionTitle}>동아리 생성</Text>
-                <Text style={styles.actionBody}>운영자가 공식 동아리를 생성합니다.</Text>
-              </View>
-              <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
-            </TouchableOpacity>
+           <Link href="/admin/create-club" asChild>
+              <TouchableOpacity style={styles.actionRow}>
+                <View style={styles.iconBox}>
+                  <MaterialIcons name="add-business" size={22} color={colors.navyDeep} />
+                </View>
+                <View style={styles.actionText}>
+                  <Text style={styles.actionTitle}>동아리 생성</Text>
+                  <Text style={styles.actionBody}>운영자가 공식 동아리를 생성합니다.</Text>
+                </View>
+                <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
+              </TouchableOpacity>
+            </Link>
             <TouchableOpacity style={styles.actionRow}>
               <View style={styles.iconBox}>
                 <MaterialIcons name="workspace-premium" size={22} color={colors.navyDeep} />
