@@ -32,12 +32,22 @@ const filterKeyMap: Record<string, string> = {
   'مذهبی': '종교', 'علمی': '학술', 'فرهنگی': '문화예술', 'سرگرمی': '취미',
 };
 
-const filterKeyMap: Record<string, string> = {
-  'All': '전체', 'Recruiting': '모집 중',
-  '全体': '전체', '募集中': '모집 중',
-  '全部': '전체', '招募中': '모집 중',
-  'Tất cả': '전체', 'Đang tuyển': '모집 중',
-  'همه': '전체', 'در حال پذیرش': '모집 중',
+const subtitleByLang: Record<string, string> = {
+  ko: '실제 선문대학교 동아리를 찾아보세요',
+  en: 'Find real Sunmoon University clubs',
+  ja: '実際の鮮文大学のサークルを探してみましょう',
+  zh: '查找真实的鲜文大学社团',
+  vi: 'Tìm câu lạc bộ thực tế của Đại học Sunmoon',
+  fa: 'باشگاه‌های واقعی دانشگاه سانمون را بیابید',
+};
+
+const placeholderByLang: Record<string, string> = {
+  ko: '동아리명, 소개, 카테고리 검색',
+  en: 'Search clubs, descriptions, categories',
+  ja: 'サークル名、紹介、カテゴリ検索',
+  zh: '搜索社团名称、介绍、类别',
+  vi: 'Tìm kiếm tên, giới thiệu, danh mục',
+  fa: 'جستجوی نام، معرفی، دسته‌بندی',
 };
 
 export default function ExploreScreen() {
@@ -74,24 +84,6 @@ export default function ExploreScreen() {
     });
   }, [activeFilter, query, contentLanguage, contentTranslationEnabled]);
 
-  const subtitleByLang: Record<string, string> = {
-    ko: '실제 선문대학교 동아리를 찾아보세요',
-    en: 'Find real Sunmoon University clubs',
-    ja: '実際の鮮文大学のサークルを探してみましょう',
-    zh: '查找真实的鲜文大学社团',
-    vi: 'Tìm câu lạc bộ thực tế của Đại học Sunmoon',
-    fa: 'باشگاه‌های واقعی دانشگاه سانمون را بیابید',
-  };
-
-  const placeholderByLang: Record<string, string> = {
-    ko: '동아리명, 소개, 카테고리 검색',
-    en: 'Search clubs, descriptions, categories',
-    ja: 'サークル名、紹介、カテゴリ検索',
-    zh: '搜索社团名称、介绍、类别',
-    vi: 'Tìm kiếm tên, giới thiệu, danh mục',
-    fa: 'جستجوی نام، معرفی، دسته‌بندی',
-  };
-
   const countByLang: Record<string, string> = {
     ko: `총 ${filteredClubs.length}개 동아리`,
     en: `${filteredClubs.length} clubs`,
@@ -119,7 +111,7 @@ export default function ExploreScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
           {filters.map((filter) => {
             const koFilter = filterKeyMap[filter] ?? filter;
-            const active = (filterKeyMap[activeFilter] ?? activeFilter) === (filterKeyMap[filter] ?? filter);
+            const active = activeFilter === koFilter;
             return (
               <TouchableOpacity
                 key={filter}
