@@ -7,11 +7,20 @@ import { Badge } from '@/components/Badge';
 import { Section } from '@/components/Section';
 import { StatCard } from '@/components/StatCard';
 import { colors } from '@/constants/theme';
-import { applicationFields, clubs, leaderApplications } from '@/data/mock';
+import { applicationFields, clubs } from '@/data/mock';
+import { useApplicationStore } from '@/store/applicationStore';
+import { useNotificationStore } from '@/store/notificationStore';
 import { statusLabel } from '@/utils/status';
 
 export default function LeaderDashboardScreen() {
   const club = clubs[0];
+  const { leaderApplications, decideApplication } = useApplicationStore();
+  const { sendApplicationResult } = useNotificationStore();
+
+  const handleDecide = (applicationId: string, status: 'ACCEPTED' | 'REJECTED') => {
+    decideApplication(applicationId, status);
+    sendApplicationResult(club.name, status);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -40,32 +49,52 @@ export default function LeaderDashboardScreen() {
 
         <Section title="지원자 관리">
           <View style={styles.list}>
-            {leaderApplications.map((application) => (
-              <View key={application.id} style={styles.applicantCard}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{application.applicantName.slice(0, 1)}</Text>
-                </View>
-                <View style={styles.applicantBody}>
-                  <View style={styles.applicantTop}>
-                    <View>
-                      <Text style={styles.applicantName}>{application.applicantName}</Text>
-                      <Text style={styles.applicantMeta}>
-                        {application.applicantStudentId} · {application.submittedAt}
-                      </Text>
+            {leaderApplications.map((application) => {
+              const decided =
+                application.status === 'ACCEPTED' || application.status === 'REJECTED';
+              return (
+                <View key={application.id} style={styles.applicantCard}>
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>
+                      {application.applicantName.slice(0, 1)}
+                    </Text>
+                  </View>
+                  <View style={styles.applicantBody}>
+                    <View style={styles.applicantTop}>
+                      <View>
+                        <Text style={styles.applicantName}>{application.applicantName}</Text>
+                        <Text style={styles.applicantMeta}>
+                          {application.applicantStudentId} · {application.submittedAt}
+                        </Text>
+                      </View>
+                      <Badge label={statusLabel(application.status)} tone="gold" />
                     </View>
-                    <Badge label={statusLabel(application.status)} tone="gold" />
-                  </View>
-                  <View style={styles.decisionRow}>
-                    <TouchableOpacity style={styles.acceptButton}>
-                      <Text style={styles.acceptText}>합격</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.rejectButton}>
-                      <Text style={styles.rejectText}>불합격</Text>
-                    </TouchableOpacity>
+                    {decided ? (
+                      <Text style={styles.decidedLabel}>
+                        {application.status === 'ACCEPTED'
+                          ? '✅ 합격 처리 완료 · 알림 발송됨'
+                          : '❌ 불합격 처리 완료 · 알림 발송됨'}
+                      </Text>
+                    ) : (
+                      <View style={styles.decisionRow}>
+                        <TouchableOpacity
+                          style={styles.acceptButton}
+                          onPress={() => handleDecide(application.id, 'ACCEPTED')}
+                        >
+                          <Text style={styles.acceptText}>합격</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.rejectButton}
+                          onPress={() => handleDecide(application.id, 'REJECTED')}
+                        >
+                          <Text style={styles.rejectText}>불합격</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         </Section>
 
@@ -138,6 +167,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   rejectText: { color: colors.critical, fontSize: 13, fontWeight: '900' },
+  decidedLabel: { color: colors.inkMuted, fontSize: 12 },
   backButton: {
     alignItems: 'center',
     backgroundColor: colors.surfaceSoft,
