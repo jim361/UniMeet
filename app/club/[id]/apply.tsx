@@ -6,10 +6,46 @@ import { AppHeader } from '@/components/AppHeader';
 import { Badge } from '@/components/Badge';
 import { colors } from '@/constants/theme';
 import { applicationFields, clubs, currentUser } from '@/data/mock';
+import { useApplicationStore } from '@/store/applicationStore';
 
 export default function ApplyScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const club = clubs.find((item) => item.id === id);
+  const { hasApplied, submitApplication } = useApplicationStore();
+  const alreadyApplied = id ? hasApplied(id) : false;
+
+  if (alreadyApplied) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <AppHeader title="지원서 작성" subtitle={club?.name} showBell={false} showBack />
+        <View style={styles.alreadyWrap}>
+          <MaterialIcons name="assignment-turned-in" size={52} color={colors.navyDeep} />
+          <Text style={styles.alreadyTitle}>이미 가입 신청서를 제출하셨습니다.</Text>
+          <Text style={styles.alreadyBody}>심사 결과를 기다려 주세요.</Text>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backText}>돌아가기</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const handleSubmit = () => {
+    if (!id) return;
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+    submitApplication({
+      id: `app-${Date.now()}`,
+      clubId: id,
+      applicantName: currentUser.name,
+      applicantStudentId: currentUser.studentId,
+      status: 'PENDING',
+      submittedAt: dateStr,
+      formSnapshot: applicationFields,
+    });
+    router.replace('/(tabs)/applications');
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -70,11 +106,9 @@ export default function ApplyScreen() {
           </Text>
         </View>
 
-        <Link href="/(tabs)/applications" asChild>
-          <TouchableOpacity style={styles.submitButton}>
-            <Text style={styles.submitText}>지원서 제출하기</Text>
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitText}>지원서 제출하기</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -83,6 +117,33 @@ export default function ApplyScreen() {
 const styles = StyleSheet.create({
   container: { backgroundColor: colors.surface, flex: 1 },
   content: { gap: 16, padding: 16, paddingBottom: 28 },
+  alreadyWrap: {
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+    justifyContent: 'center',
+    padding: 32,
+  },
+  alreadyTitle: {
+    color: colors.inkDeep,
+    fontSize: 18,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  alreadyBody: {
+    color: colors.inkMuted,
+    fontSize: 15,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  backButton: {
+    alignItems: 'center',
+    backgroundColor: colors.navyDeep,
+    borderRadius: 14,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+  },
+  backText: { color: colors.canvas, fontSize: 15, fontWeight: '900' },
   header: { gap: 8 },
   kicker: { color: colors.gold, fontSize: 13, fontWeight: '900' },
   title: { color: colors.inkDeep, fontSize: 27, fontWeight: '900' },
