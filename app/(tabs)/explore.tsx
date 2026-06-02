@@ -6,7 +6,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { ClubCard } from '@/components/ClubCard';
 import { EmptyState } from '@/components/EmptyState';
 import { colors } from '@/constants/theme';
-import { clubs } from '@/data/mock';
+import { useClubStore } from '@/store/clubStore';
 
 const filters = ['전체', '모집 중', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'];
 
