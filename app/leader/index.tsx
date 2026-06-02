@@ -8,7 +8,7 @@ import { Section } from '@/components/Section';
 import { StatCard } from '@/components/StatCard';
 import { colors } from '@/constants/theme';
 import { applicationFields, clubs } from '@/data/mock';
-import { useApplicationStore } from '@/store/applicationStore';
+import { useClubApplicationStore } from '@/store/clubApplicationStore';
 import { useNotificationStore } from '@/store/notificationStore';
 import { statusLabel } from '@/utils/status';
 
