@@ -11,6 +11,7 @@ import { useClubStore } from '@/store/clubStore';
 const filters = ['전체', '모집 중', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'];
 
 export default function ExploreScreen() {
+  const { clubs } = useClubStore();
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('전체');
 
