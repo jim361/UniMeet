@@ -19,6 +19,7 @@ const uiLanguages: Array<{ code: UiLanguage; label: string; description: string 
   { code: 'ja', label: uiLanguageLabels.ja, description: '日本語' },
   { code: 'zh', label: uiLanguageLabels.zh, description: '中文' },
   { code: 'vi', label: uiLanguageLabels.vi, description: 'Tiếng Việt' },
+  { code: 'fa', label: uiLanguageLabels.fa, description: 'فارسی' },
 ];
 
 const contentLanguages: Array<{ code: ContentLanguage; label: string; description: string }> = [
@@ -26,6 +27,7 @@ const contentLanguages: Array<{ code: ContentLanguage; label: string; descriptio
   { code: 'ja', label: contentLanguageLabels.ja, description: '日本語' },
   { code: 'zh', label: contentLanguageLabels.zh, description: '中文' },
   { code: 'vi', label: contentLanguageLabels.vi, description: 'Tiếng Việt' },
+  { code: 'fa', label: contentLanguageLabels.fa, description: 'فارسی' },
 ];
 
 export default function LanguageSettingsScreen() {
@@ -114,11 +116,11 @@ function LanguageRow({
   active: boolean;
   onPress: () => void;
 }) {
-  return (
+return (
     <TouchableOpacity style={styles.languageRow} onPress={onPress}>
       <View style={styles.languageText}>
-        <Text style={styles.languageTitle}>{title}</Text>
-        <Text style={styles.languageDescription}>{description}</Text>
+        <Text style={[styles.languageTitle, { writingDirection: 'ltr', textAlign: 'left' }]}>{title}</Text>
+        <Text style={[styles.languageDescription, { writingDirection: 'ltr', textAlign: 'left' }]}>{description}</Text>
       </View>
       <View style={[styles.radio, active && styles.radioActive]}>
         {active ? <MaterialIcons name="check" size={16} color={colors.canvas} /> : null}
