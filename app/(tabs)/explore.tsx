@@ -10,7 +10,22 @@ import { clubs } from '@/data/mock';
 import { useLanguageStore } from '@/store/languageStore';
 import { useT } from '@/utils/i18n';
 
-const filterKeys = ['전체', '모집 중', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'];
+const filtersByLang: Record<string, string[]> = {
+  ko: ['전체', '모집 중', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'],
+  en: ['All', 'Recruiting', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'],
+  ja: ['全体', '募集中', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'],
+  zh: ['全部', '招募中', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'],
+  vi: ['Tất cả', 'Đang tuyển', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'],
+  fa: ['همه', 'در حال پذیرش', '봉사', '국제교류', '종교', '학술', '문화예술', '취미'],
+};
+
+const filterKeyMap: Record<string, string> = {
+  'All': '전체', 'Recruiting': '모집 중',
+  '全体': '전체', '募集中': '모집 중',
+  '全部': '전체', '招募中': '모집 중',
+  'Tất cả': '전체', 'Đang tuyển': '모집 중',
+  'همه': '전체', 'در حال پذیرش': '모집 중',
+};
 
 export default function ExploreScreen() {
   const [query, setQuery] = useState('');
@@ -18,11 +33,11 @@ export default function ExploreScreen() {
   const { uiLanguage, contentLanguage, contentTranslationEnabled } = useLanguageStore();
   const t = useT();
 
+  const filters = filtersByLang[uiLanguage] ?? filtersByLang.ko;
+
   const filteredClubs = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-
     return clubs.filter((club) => {
-      // 번역된 설명도 검색에 포함
       const translatedDescription =
         contentTranslationEnabled && contentLanguage !== 'ko'
           ? club.descriptionTranslations?.[contentLanguage as 'en' | 'ja' | 'zh' | 'vi'] || ''
@@ -36,64 +51,83 @@ export default function ExploreScreen() {
         translatedDescription.toLowerCase().includes(normalizedQuery) ||
         club.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery));
 
+      const koFilter = filterKeyMap[activeFilter] ?? activeFilter;
       const matchedFilter =
-        activeFilter === '전체' ||
-        (activeFilter === '모집 중' && club.isRecruiting) ||
-        club.category === activeFilter;
+        koFilter === '전체' ||
+        (koFilter === '모집 중' && club.isRecruiting) ||
+        club.category === koFilter;
 
       return matchedQuery && matchedFilter;
     });
   }, [activeFilter, query, contentLanguage, contentTranslationEnabled]);
 
+  const subtitleByLang: Record<string, string> = {
+    ko: '실제 선문대학교 동아리를 찾아보세요',
+    en: 'Find real Sunmoon University clubs',
+    ja: '実際の鮮文大学のサークルを探してみましょう',
+    zh: '查找真实的鲜文大学社团',
+    vi: 'Tìm câu lạc bộ thực tế của Đại học Sunmoon',
+    fa: 'باشگاه‌های واقعی دانشگاه سانمون را بیابید',
+  };
+
+  const placeholderByLang: Record<string, string> = {
+    ko: '동아리명, 소개, 카테고리 검색',
+    en: 'Search clubs, descriptions, categories',
+    ja: 'サークル名、紹介、カテゴリ検索',
+    zh: '搜索社团名称、介绍、类别',
+    vi: 'Tìm kiếm tên, giới thiệu, danh mục',
+    fa: 'جستجوی نام، معرفی، دسته‌بندی',
+  };
+
+  const countByLang: Record<string, string> = {
+    ko: `총 ${filteredClubs.length}개 동아리`,
+    en: `${filteredClubs.length} clubs`,
+    ja: `合計 ${filteredClubs.length} サークル`,
+    zh: `共 ${filteredClubs.length} 个社团`,
+    vi: `Tổng ${filteredClubs.length} câu lạc bộ`,
+    fa: `مجموع ${filteredClubs.length} باشگاه`,
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title={t('explore')} subtitle="실제 선문대학교 동아리를 찾아보세요" />
+      <AppHeader title={t('explore')} subtitle={subtitleByLang[uiLanguage] ?? subtitleByLang.ko} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.searchBox}>
           <MaterialIcons name="search" size={22} color={colors.inkMuted} />
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="동아리명, 소개, 카테고리 검색"
+            placeholder={placeholderByLang[uiLanguage] ?? placeholderByLang.ko}
             placeholderTextColor={colors.inkMuted}
             style={styles.searchInput}
           />
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterRow}
-        >
-          {filterKeys.map((filter) => {
-            const active = activeFilter === filter;
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+          {filters.map((filter) => {
+            const koFilter = filterKeyMap[filter] ?? filter;
+            const active = (filterKeyMap[activeFilter] ?? activeFilter) === (filterKeyMap[filter] ?? filter);
             return (
               <TouchableOpacity
                 key={filter}
-                onPress={() => setActiveFilter(filter)}
+                onPress={() => setActiveFilter(koFilter)}
                 style={[styles.filterChip, active && styles.filterChipActive]}
               >
-                <Text style={[styles.filterText, active && styles.filterTextActive]}>
-                  {filter}
-                </Text>
+                <Text style={[styles.filterText, active && styles.filterTextActive]}>{filter}</Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
 
         <View style={styles.countRow}>
-          <Text style={styles.countText}>총 {filteredClubs.length}개 동아리</Text>
+          <Text style={styles.countText}>{countByLang[uiLanguage] ?? countByLang.ko}</Text>
         </View>
 
         <View style={styles.list}>
           {filteredClubs.length > 0 ? (
             filteredClubs.map((club) => <ClubCard key={club.id} club={club} />)
           ) : (
-            <EmptyState
-              icon="search-off"
-              title="검색 결과가 없어요"
-              body="다른 키워드나 필터로 다시 찾아보세요."
-            />
+            <EmptyState icon="search-off" title="검색 결과가 없어요" body="다른 키워드나 필터로 다시 찾아보세요." />
           )}
         </View>
       </ScrollView>
