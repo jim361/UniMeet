@@ -10,6 +10,42 @@ type ClubCardProps = {
   club: Club;
 };
 
+const categoryByLang: Record<string, Record<string, string>> = {
+  ko: { '봉사': '봉사', '국제교류': '국제교류', '종교': '종교', '학술': '학술', '문화예술': '문화예술', '취미': '취미' },
+  en: { '봉사': 'Volunteer', '국제교류': 'International', '종교': 'Religion', '학술': 'Academic', '문화예술': 'Culture & Arts', '취미': 'Hobby' },
+  ja: { '봉사': 'ボランティア', '국제교류': '国際交流', '종교': '宗教', '학술': '学術', '문화예술': '文化芸術', '취미': '趣味' },
+  zh: { '봉사': '志愿服务', '국제교류': '国际交流', '종교': '宗教', '학술': '学术', '문화예술': '文化艺术', '취미': '兴趣' },
+  vi: { '봉사': 'Tình nguyện', '국제교류': 'Quốc tế', '종교': 'Tôn giáo', '학술': 'Học thuật', '문화예술': 'Văn hóa', '취미': 'Sở thích' },
+  fa: { '봉사': 'داوطلبانه', '국제교류': 'بین‌المللی', '종교': 'مذهبی', '학술': 'علمی', '문화예술': 'فرهنگی', '취미': 'سرگرمی' },
+};
+
+const tagByLang: Record<string, Record<string, string>> = {
+  ko: { '실제 동아리': '실제 동아리', '모집 중': '모집 중', '모집 마감': '모집 마감', '아동 봉사': '아동 봉사', '풍선아트': '풍선아트' },
+  en: { '실제 동아리': 'Real Club', '모집 중': 'Recruiting', '모집 마감': 'Closed', '아동 봉사': 'Child Volunteer', '풍선아트': 'Balloon Art' },
+  ja: { '실제 동아리': '公認サークル', '모집 중': '募集中', '모집 마감': '募集終了' },
+  zh: { '실제 동아리': '真实社团', '모집 중': '招募中', '모집 마감': '招募结束' },
+  vi: { '실제 동아리': 'CLB thực', '모집 중': 'Đang tuyển', '모집 마감': 'Đã đóng' },
+  fa: { '실제 동아리': 'باشگاه واقعی', '모집 중': 'در حال پذیرش', '모집 마감': 'پذیرش بسته' },
+};
+
+const badgeLabelByLang: Record<string, Record<string, string>> = {
+  ko: { VERIFIED: '검토 완료', PENDING_REVIEW: '검토 중', NONE: '미검토' },
+  en: { VERIFIED: 'Verified', PENDING_REVIEW: 'Pending', NONE: 'Unreviewed' },
+  ja: { VERIFIED: '審査済み', PENDING_REVIEW: '審査中', NONE: '未審査' },
+  zh: { VERIFIED: '已审核', PENDING_REVIEW: '审核中', NONE: '未审核' },
+  vi: { VERIFIED: 'Đã xác minh', PENDING_REVIEW: 'Đang xét', NONE: 'Chưa xét' },
+  fa: { VERIFIED: 'تأیید شده', PENDING_REVIEW: 'در حال بررسی', NONE: 'بررسی نشده' },
+};
+
+const recruitingByLang: Record<string, { yes: string; no: string }> = {
+  ko: { yes: '모집 중', no: '모집 마감' },
+  en: { yes: 'Recruiting', no: 'Closed' },
+  ja: { yes: '募集中', no: '募集終了' },
+  zh: { yes: '招募中', no: '招募结束' },
+  vi: { yes: 'Đang tuyển', no: 'Đã đóng' },
+  fa: { yes: 'در حال پذیرش', no: 'پذیرش بسته' },
+};
+
 export function ClubCard({ club }: ClubCardProps) {
   const router = useRouter();
   const { uiLanguage, contentLanguage, contentTranslationEnabled } = useLanguageStore();
@@ -21,26 +57,12 @@ export function ClubCard({ club }: ClubCardProps) {
       ? club.descriptionTranslations?.[contentLanguage as 'en' | 'ja' | 'zh' | 'vi'] || club.description
       : club.description;
 
-  const badgeLabelByLang: Record<string, Record<string, string>> = {
-    ko: { VERIFIED: '검토 완료', PENDING_REVIEW: '검토 중', NONE: '미검토' },
-    en: { VERIFIED: 'Verified', PENDING_REVIEW: 'Pending', NONE: 'Unreviewed' },
-    ja: { VERIFIED: '審査済み', PENDING_REVIEW: '審査中', NONE: '未審査' },
-    zh: { VERIFIED: '已审核', PENDING_REVIEW: '审核中', NONE: '未审核' },
-    vi: { VERIFIED: 'Đã xác minh', PENDING_REVIEW: 'Đang xét', NONE: 'Chưa xét' },
-    fa: { VERIFIED: 'تأیید شده', PENDING_REVIEW: 'در حال بررسی', NONE: 'بررسی نشده' },
-  };
-
-  const recruitingByLang: Record<string, { yes: string; no: string }> = {
-    ko: { yes: '모집 중', no: '모집 마감' },
-    en: { yes: 'Recruiting', no: 'Closed' },
-    ja: { yes: '募集中', no: '募集終了' },
-    zh: { yes: '招募中', no: '招募结束' },
-    vi: { yes: 'Đang tuyển', no: 'Đã đóng' },
-    fa: { yes: 'در حال پذیرش', no: 'پذیرش بسته' },
-  };
-
+  const langCategory = categoryByLang[uiLanguage] ?? categoryByLang.ko;
+  const langTag = tagByLang[uiLanguage] ?? tagByLang.ko;
   const langBadges = badgeLabelByLang[uiLanguage] ?? badgeLabelByLang.ko;
   const langRecruit = recruitingByLang[uiLanguage] ?? recruitingByLang.ko;
+
+  const categoryLabel = langCategory[club.category] ?? club.category;
   const badgeLabel = langBadges[club.safetyBadgeStatus] ?? langBadges.NONE;
 
   return (
@@ -62,7 +84,7 @@ export function ClubCard({ club }: ClubCardProps) {
           {displayDescription}
         </Text>
         <View style={styles.badgeRow}>
-          <Badge label={club.category} tone="gold" />
+          <Badge label={categoryLabel} tone="gold" />
           <Badge label={club.isRecruiting ? langRecruit.yes : langRecruit.no} tone={club.isRecruiting ? 'green' : 'muted'} />
           <Badge label={badgeLabel} tone={club.safetyBadgeStatus === 'VERIFIED' ? 'navy' : 'muted'} />
         </View>
