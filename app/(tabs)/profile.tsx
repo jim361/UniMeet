@@ -7,18 +7,35 @@ import { Badge } from '@/components/Badge';
 import { colors } from '@/constants/theme';
 import { currentUser } from '@/data/mock';
 import { contentLanguageLabels, uiLanguageLabels, useLanguageStore } from '@/store/languageStore';
+import { useClubApplicationStore } from '@/store/clubApplicationStore';
 import { useT } from '@/utils/i18n';
+
+const STATUS_COLOR: Record<string, string> = {
+  pending: '#f59e0b',
+  approved: '#10b981',
+  rejected: '#ef4444',
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: '심사 중',
+  approved: '승인됨',
+  rejected: '거절됨',
+};
 
 export default function ProfileScreen() {
   const router = useRouter();
   const t = useT();
   const uiLanguage = useLanguageStore((state) => state.uiLanguage);
   const contentLanguage = useLanguageStore((state) => state.contentLanguage);
+  const { getMyApplications } = useClubApplicationStore();
+  const myApplications = getMyApplications(currentUser.id);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <AppHeader title={t('profile')} subtitle={t('profileSubtitle')} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+
+        {/* 프로필 카드 */}
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{currentUser.name.slice(1, 3)}</Text>
@@ -31,6 +48,36 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* 내 신청 현황 */}
+        <View style={styles.panel}>
+          <Text style={styles.panelTitle}>내 동아리 신청 현황</Text>
+          {myApplications.length === 0 ? (
+            <View style={styles.emptyRow}>
+              <Text style={styles.emptyText}>신청한 동아리가 없습니다.</Text>
+            </View>
+          ) : (
+            myApplications.map((app) => (
+              <View key={app.id} style={styles.appRow}>
+                <View style={styles.appLeft}>
+                  <MaterialIcons name="groups" size={20} color={colors.navyDeep} />
+                  <View>
+                    <Text style={styles.appClubName}>{app.clubName}</Text>
+                    <Text style={styles.appDate}>
+                      신청일: {new Date(app.appliedAt).toLocaleDateString('ko-KR')}
+                    </Text>
+                  </View>
+                </View>
+                <View style={[styles.statusBadge, { backgroundColor: STATUS_COLOR[app.status] + '20' }]}>
+                  <Text style={[styles.statusText, { color: STATUS_COLOR[app.status] }]}>
+                    {STATUS_LABEL[app.status]}
+                  </Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+
+        {/* 권한별 대시보드 */}
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>{t('dashboardByRole')}</Text>
           <Link href="/leader" asChild>
@@ -53,6 +100,7 @@ export default function ProfileScreen() {
           </Link>
         </View>
 
+        {/* 계정 설정 */}
         <View style={styles.panel}>
           <Text style={styles.panelTitle}>{t('accountSettings')}</Text>
           <TouchableOpacity style={styles.row} onPress={() => router.push('/settings/language')}>
@@ -75,6 +123,7 @@ export default function ProfileScreen() {
             <Text style={styles.logoutText}>{t('logout')}</Text>
           </TouchableOpacity>
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -118,6 +167,26 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 8,
   },
+  emptyRow: {
+    alignItems: 'center',
+    borderTopColor: colors.borderSoft,
+    borderTopWidth: 1,
+    padding: 20,
+  },
+  emptyText: { color: colors.inkMuted, fontSize: 14 },
+  appRow: {
+    alignItems: 'center',
+    borderTopColor: colors.borderSoft,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 14,
+  },
+  appLeft: { alignItems: 'center', flexDirection: 'row', gap: 10 },
+  appClubName: { color: colors.inkDeep, fontSize: 15, fontWeight: '800' },
+  appDate: { color: colors.inkMuted, fontSize: 12, marginTop: 2 },
+  statusBadge: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  statusText: { fontSize: 12, fontWeight: '700' },
   row: {
     alignItems: 'center',
     borderTopColor: colors.borderSoft,
