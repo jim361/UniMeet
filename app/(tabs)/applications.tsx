@@ -5,10 +5,13 @@ import { AppHeader } from '@/components/AppHeader';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { colors } from '@/constants/theme';
-import { clubs, myApplications } from '@/data/mock';
+import { clubs } from '@/data/mock';
+import { useApplicationStore } from '@/store/applicationStore';
 import { statusLabel } from '@/utils/status';
 
 export default function ApplicationsScreen() {
+  const { myApplications } = useApplicationStore();
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <AppHeader title="지원내역" subtitle="제출한 지원서 상태를 확인하세요" />
