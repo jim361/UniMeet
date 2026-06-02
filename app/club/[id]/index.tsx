@@ -82,10 +82,21 @@ export default function ClubDetailScreen() {
                 <Text style={styles.summaryLabel}>{t('language')}</Text>
               </View>
             </View>
-            <View style={styles.badges}>
-              {club.tags.map((tag) => (
-                <Badge key={tag} label={tag} tone={tag.includes('모집') ? 'green' : 'muted'} />
-              ))}
+           <View style={styles.badges}>
+              {club.tags.map((tag) => {
+                const tagMap: Record<string, Record<string, string>> = {
+                  ko: { '봉사': '봉사', '실제 동아리': '실제 동아리', '모집 중': '모집 중', '모집 마감': '모집 마감', '국제교류': '국제교류', '종교': '종교', '학술': '학술', '문화예술': '문화예술', '취미': '취미' },
+                  en: { '봉사': 'Volunteer', '실제 동아리': 'Real Club', '모집 중': 'Recruiting', '모집 마감': 'Closed', '국제교류': 'International', '종교': 'Religion', '학술': 'Academic', '문화예술': 'Culture & Arts', '취미': 'Hobby' },
+                  ja: { '봉사': 'ボランティア', '실제 동아리': '公認', '모집 중': '募集中', '모집 마감': '募集終了', '국제교류': '国際交流', '종교': '宗教', '학술': '学術', '문화예술': '文化芸術', '취미': '趣味' },
+                  zh: { '봉사': '志愿', '실제 동아리': '真实社团', '모집 중': '招募中', '모집 마감': '招募结束', '국제교류': '国际交流', '종교': '宗教', '학술': '学术', '문화예술': '文化艺术', '취미': '兴趣' },
+                  vi: { '봉사': 'Tình nguyện', '실제 동아리': 'CLB thực', '모집 중': 'Đang tuyển', '모집 마감': 'Đã đóng', '국제교류': 'Quốc tế', '종교': 'Tôn giáo', '학술': 'Học thuật', '문화예술': 'Văn hóa', '취미': 'Sở thích' },
+                  fa: { '봉사': 'داوطلبانه', '실제 동아리': 'باشگاه واقعی', '모집 중': 'در حال پذیرش', '모집 마감': 'پذیرش بسته', '국제교류': 'بین‌المللی', '종교': 'مذهبی', '학술': 'علمی', '문화예술': 'فرهنگی', '취미': 'سرگرمی' },
+                };
+                const translatedTag = (tagMap[uiLanguage] ?? tagMap.ko)[tag] ?? tag;
+                return (
+                  <Badge key={tag} label={translatedTag} tone={tag.includes('모집') ? 'green' : 'muted'} />
+                );
+              })}
               <Badge label={badgeLabel} tone={club.safetyBadgeStatus === 'VERIFIED' ? 'navy' : 'muted'} />
             </View>
           </View>
