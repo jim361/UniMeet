@@ -1,4 +1,3 @@
-// app/admin/create-club.tsx
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -14,10 +13,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/AppHeader';
 import { colors } from '@/constants/theme';
-import { clubs } from '@/data/mock';
+import { useClubStore } from '@/store/clubStore';
 
 export default function CreateClubScreen() {
   const router = useRouter();
+  const { addClub } = useClubStore();
 
   const [name, setName] = useState('');
   const [englishName, setEnglishName] = useState('');
@@ -45,7 +45,6 @@ export default function CreateClubScreen() {
 
     setSubmitting(true);
 
-    // 새 동아리 추가
     const newClub = {
       id: `club-${Date.now()}`,
       name: name.trim(),
@@ -69,7 +68,7 @@ export default function CreateClubScreen() {
       recentActivityTranslations: { en: ['Regular meeting'] },
     };
 
-    clubs.push(newClub);
+    addClub(newClub);
     setSubmitting(false);
 
     Alert.alert(
@@ -84,7 +83,6 @@ export default function CreateClubScreen() {
       <AppHeader title="동아리 생성" subtitle="새 동아리를 등록합니다" showBack />
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
-        {/* 동아리 이름 */}
         <View style={styles.field}>
           <Text style={styles.label}>동아리 이름 <Text style={styles.required}>*</Text></Text>
           <TextInput
@@ -96,7 +94,6 @@ export default function CreateClubScreen() {
           />
         </View>
 
-        {/* 영문 이름 */}
         <View style={styles.field}>
           <Text style={styles.label}>영문 이름</Text>
           <TextInput
@@ -108,7 +105,6 @@ export default function CreateClubScreen() {
           />
         </View>
 
-        {/* 카테고리 */}
         <View style={styles.field}>
           <Text style={styles.label}>카테고리 <Text style={styles.required}>*</Text></Text>
           <View style={styles.categoryGrid}>
@@ -126,7 +122,6 @@ export default function CreateClubScreen() {
           </View>
         </View>
 
-        {/* 동아리 소개 */}
         <View style={styles.field}>
           <Text style={styles.label}>동아리 소개 <Text style={styles.required}>*</Text></Text>
           <TextInput
@@ -142,7 +137,6 @@ export default function CreateClubScreen() {
           <Text style={styles.charCount}>{description.length}/500</Text>
         </View>
 
-        {/* 멤버 수 */}
         <View style={styles.field}>
           <Text style={styles.label}>멤버 수</Text>
           <TextInput
@@ -155,7 +149,6 @@ export default function CreateClubScreen() {
           />
         </View>
 
-        {/* 모집 여부 */}
         <View style={styles.field}>
           <Text style={styles.label}>모집 상태</Text>
           <View style={styles.toggleRow}>
@@ -178,7 +171,6 @@ export default function CreateClubScreen() {
           </View>
         </View>
 
-        {/* 생성 버튼 */}
         <TouchableOpacity
           style={[styles.createButton, submitting && styles.disabledButton]}
           onPress={handleCreate}
@@ -235,13 +227,13 @@ const styles = StyleSheet.create({
   categoryTextActive: { color: colors.canvas },
   toggleRow: { flexDirection: 'row', gap: 10 },
   toggleChip: {
+    alignItems: 'center',
     backgroundColor: colors.canvas,
     borderColor: colors.border,
     borderRadius: 10,
     borderWidth: 1,
     flex: 1,
     paddingVertical: 12,
-    alignItems: 'center',
   },
   toggleChipActive: { backgroundColor: '#d1fae5', borderColor: '#10b981' },
   toggleChipActiveRed: { backgroundColor: '#fee2e2', borderColor: '#ef4444' },
