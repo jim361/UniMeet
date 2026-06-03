@@ -183,4 +183,3 @@ const styles = StyleSheet.create({
   },
   backText: { color: colors.navyDeep, fontSize: 15, fontWeight: '900' },
 });
-
