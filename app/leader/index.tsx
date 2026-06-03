@@ -1,27 +1,47 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/AppHeader';
-import { Badge } from '@/components/Badge';
 import { Section } from '@/components/Section';
 import { StatCard } from '@/components/StatCard';
 import { colors } from '@/constants/theme';
-import { applicationFields, clubs } from '@/data/mock';
+import { clubs, currentUser } from '@/data/mock';
 import { useClubApplicationStore } from '@/store/clubApplicationStore';
-import { useNotificationStore } from '@/store/notificationStore';
-import { statusLabel } from '@/utils/status';
 
 export default function LeaderDashboardScreen() {
   const club = clubs[0];
 
-  const leaderApplications = useApplicationStore((state) => state.leaderApplications);
-  const decideApplication = useApplicationStore((state) => state.decideApplication);
-  const sendApplicationResult = useNotificationStore((state) => state.sendApplicationResult);
+  const { applications, approveApplication, rejectApplication } = useClubApplicationStore();
+  const clubApplications = applications.filter((a) => a.clubId === club.id);
+  const pendingCount = clubApplications.filter((a) => a.status === 'pending').length;
 
-  const handleDecide = (applicationId: string, status: 'ACCEPTED' | 'REJECTED') => {
-    decideApplication(applicationId, status);
-    sendApplicationResult(club.name, status);
+  const handleApprove = (applicationId: string, applicantName: string) => {
+    const confirmed =
+      Platform.OS === 'web'
+        ? window.confirm(`${applicantName}님을 합격 처리하시겠습니까?`)
+        : true;
+    if (confirmed) approveApplication(applicationId, currentUser.id);
+  };
+
+  const handleReject = (applicationId: string, applicantName: string) => {
+    const confirmed =
+      Platform.OS === 'web'
+        ? window.confirm(`${applicantName}님을 불합격 처리하시겠습니까?`)
+        : true;
+    if (confirmed) rejectApplication(applicationId, currentUser.id);
+  };
+
+  const STATUS_LABEL: Record<string, string> = {
+    pending: '심사 중',
+    approved: '합격',
+    rejected: '불합격',
+  };
+
+  const STATUS_COLOR: Record<string, string> = {
+    pending: colors.gold,
+    approved: colors.success,
+    rejected: colors.critical,
   };
 
   return (
@@ -29,8 +49,8 @@ export default function LeaderDashboardScreen() {
       <AppHeader title="회장 대시보드" subtitle={club.name} showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.statsRow}>
-          <StatCard icon="person-search" label="신규 지원자" value={`${leaderApplications.length}`} />
-          <StatCard icon="edit-note" label="질문 수" value={`${applicationFields.length}`} />
+          <StatCard icon="person-search" label="전체 지원자" value={`${clubApplications.length}`} />
+          <StatCard icon="hourglass-empty" label="심사 대기" value={`${pendingCount}`} />
           <StatCard icon="verified" label="홍보카드" value="검토 완료" />
         </View>
 
@@ -50,54 +70,60 @@ export default function LeaderDashboardScreen() {
         </Section>
 
         <Section title="지원자 관리">
-          <View style={styles.list}>
-            {leaderApplications.map((application) => {
-              const decided =
-                application.status === 'ACCEPTED' || application.status === 'REJECTED';
-              return (
-                <View key={application.id} style={styles.applicantCard}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {application.applicantName.slice(0, 1)}
-                    </Text>
-                  </View>
-                  <View style={styles.applicantBody}>
-                    <View style={styles.applicantTop}>
-                      <View>
-                        <Text style={styles.applicantName}>{application.applicantName}</Text>
-                        <Text style={styles.applicantMeta}>
-                          {application.applicantStudentId} · {application.submittedAt}
-                        </Text>
-                      </View>
-                      <Badge label={statusLabel(application.status)} tone="gold" />
+          {clubApplications.length === 0 ? (
+            <Text style={styles.emptyText}>아직 지원자가 없습니다.</Text>
+          ) : (
+            <View style={styles.list}>
+              {clubApplications.map((app) => {
+                const decided = app.status === 'approved' || app.status === 'rejected';
+                return (
+                  <View key={app.id} style={styles.applicantCard}>
+                    <View style={styles.avatar}>
+                      <Text style={styles.avatarText}>{app.applicantName.slice(0, 1)}</Text>
                     </View>
-                    {decided ? (
-                      <Text style={styles.decidedLabel}>
-                        {application.status === 'ACCEPTED'
-                          ? '✅ 합격 처리 완료 · 알림 발송됨'
-                          : '❌ 불합격 처리 완료 · 알림 발송됨'}
-                      </Text>
-                    ) : (
-                      <View style={styles.decisionRow}>
-                        <TouchableOpacity
-                          style={styles.acceptButton}
-                          onPress={() => handleDecide(application.id, 'ACCEPTED')}
-                        >
-                          <Text style={styles.acceptText}>합격</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.rejectButton}
-                          onPress={() => handleDecide(application.id, 'REJECTED')}
-                        >
-                          <Text style={styles.rejectText}>불합격</Text>
-                        </TouchableOpacity>
+                    <View style={styles.applicantBody}>
+                      <View style={styles.applicantTop}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.applicantName}>{app.applicantName}</Text>
+                          <Text style={styles.applicantMeta}>
+                            {app.applicantEmail} · {new Date(app.appliedAt).toLocaleDateString('ko-KR')}
+                          </Text>
+                        </View>
+                        <View style={[styles.statusBadge, { backgroundColor: STATUS_COLOR[app.status] + '20' }]}>
+                          <Text style={[styles.statusText, { color: STATUS_COLOR[app.status] }]}>
+                            {STATUS_LABEL[app.status]}
+                          </Text>
+                        </View>
                       </View>
-                    )}
+
+                      {decided ? (
+                        <Text style={styles.decidedLabel}>
+                          {app.status === 'approved'
+                            ? '✅ 합격 처리 완료 · 알림 발송됨'
+                            : '❌ 불합격 처리 완료 · 알림 발송됨'}
+                        </Text>
+                      ) : (
+                        <View style={styles.decisionRow}>
+                          <TouchableOpacity
+                            style={styles.acceptButton}
+                            onPress={() => handleApprove(app.id, app.applicantName)}
+                          >
+                            <Text style={styles.acceptText}>합격</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.rejectButton}
+                            onPress={() => handleReject(app.id, app.applicantName)}
+                          >
+                            <Text style={styles.rejectText}>불합격</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                </View>
-              );
-            })}
-          </View>
+                );
+              })}
+            </View>
+          )}
         </Section>
 
         <Link href="/(tabs)/profile" asChild>
@@ -116,66 +142,45 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 10, padding: 16, paddingBottom: 0 },
   actionGrid: { flexDirection: 'row', gap: 10 },
   actionCard: {
-    backgroundColor: colors.canvas,
-    borderColor: colors.borderSoft,
-    borderRadius: 14,
-    borderWidth: 1,
-    flex: 1,
-    gap: 8,
-    padding: 14,
+    backgroundColor: colors.canvas, borderColor: colors.borderSoft,
+    borderRadius: 14, borderWidth: 1, flex: 1, gap: 8, padding: 14,
   },
   actionTitle: { color: colors.inkDeep, fontSize: 15, fontWeight: '900' },
   actionBody: { color: colors.inkMuted, fontSize: 13, lineHeight: 18 },
+  emptyText: { color: colors.inkMuted, fontSize: 14, textAlign: 'center', paddingVertical: 20 },
   list: { gap: 12 },
   applicantCard: {
-    alignItems: 'flex-start',
-    backgroundColor: colors.canvas,
-    borderColor: colors.borderSoft,
-    borderRadius: 14,
-    borderWidth: 1,
-    flexDirection: 'row',
-    gap: 12,
-    padding: 14,
+    alignItems: 'flex-start', backgroundColor: colors.canvas,
+    borderColor: colors.borderSoft, borderRadius: 14, borderWidth: 1,
+    flexDirection: 'row', gap: 12, padding: 14,
   },
   avatar: {
-    alignItems: 'center',
-    backgroundColor: colors.goldPale,
-    borderRadius: 22,
-    height: 44,
-    justifyContent: 'center',
-    width: 44,
+    alignItems: 'center', backgroundColor: colors.goldPale,
+    borderRadius: 22, height: 44, justifyContent: 'center', width: 44,
   },
   avatarText: { color: colors.navyDeep, fontSize: 17, fontWeight: '900' },
   applicantBody: { flex: 1, gap: 12 },
-  applicantTop: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+  applicantTop: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   applicantName: { color: colors.inkDeep, fontSize: 16, fontWeight: '900' },
   applicantMeta: { color: colors.inkMuted, fontSize: 12, marginTop: 3 },
+  statusBadge: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
+  statusText: { fontSize: 12, fontWeight: '700' },
   decisionRow: { flexDirection: 'row', gap: 8 },
   acceptButton: {
-    backgroundColor: 'rgba(56,161,105,0.14)',
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(56,161,105,0.14)', borderRadius: 999,
+    paddingHorizontal: 14, paddingVertical: 8,
   },
   acceptText: { color: colors.success, fontSize: 13, fontWeight: '900' },
   rejectButton: {
-    backgroundColor: 'rgba(229,62,62,0.10)',
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(229,62,62,0.10)', borderRadius: 999,
+    paddingHorizontal: 14, paddingVertical: 8,
   },
   rejectText: { color: colors.critical, fontSize: 13, fontWeight: '900' },
   decidedLabel: { color: colors.inkMuted, fontSize: 12 },
   backButton: {
-    alignItems: 'center',
-    backgroundColor: colors.surfaceSoft,
-    borderRadius: 14,
-    marginHorizontal: 16,
-    padding: 15,
+    alignItems: 'center', backgroundColor: colors.surfaceSoft,
+    borderRadius: 14, marginHorizontal: 16, padding: 15,
   },
   backText: { color: colors.navyDeep, fontSize: 15, fontWeight: '900' },
 });
+
