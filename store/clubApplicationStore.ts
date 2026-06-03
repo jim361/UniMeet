@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useMessageStore } from '@/store/messageStore'; // 파일 상단에 추가
 
 export type ApplicationStatus = "pending" | "approved" | "rejected";
 
@@ -93,6 +94,13 @@ export const useClubApplicationStore = create<ClubApplicationState>(
         applicationId: app.id,
       });
     },
+    useMessageStore.getState().addMessage({
+  clubId: app.clubId,
+  clubName: app.clubName,
+  title: '동아리 가입 완료',
+  body: `축하합니다. ${app.clubName} 가입 완료되었습니다.`,
+  type: 'ACCEPTED',
+});
 
     rejectApplication: (applicationId, adminId) => {
       const app = get().applications.find((a) => a.id === applicationId);
@@ -119,6 +127,13 @@ export const useClubApplicationStore = create<ClubApplicationState>(
         applicationId: app.id,
       });
     },
+    useMessageStore.getState().addMessage({
+  clubId: app.clubId,
+  clubName: app.clubName,
+  title: '동아리 지원 결과',
+  body: `${app.clubName}에 지원해주셔서 감사합니다. 아쉽지만 다음 기회에 도전해주세요.`,
+  type: 'REJECTED',
+});
 
     getMyApplications: (userId) => {
       return get().applications.filter((a) => a.applicantId === userId);
