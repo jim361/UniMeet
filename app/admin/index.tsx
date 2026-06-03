@@ -8,6 +8,7 @@ import { Section } from '@/components/Section';
 import { StatCard } from '@/components/StatCard';
 import { colors } from '@/constants/theme';
 import { clubs } from '@/data/mock';
+import { useClubApplicationStore } from '@/store/clubApplicationStore';
 
 const auditItems = [
   '글로벌 시민 회장 권한 부여',
@@ -16,28 +17,51 @@ const auditItems = [
 ];
 
 export default function AdminDashboardScreen() {
+  const applications = useClubApplicationStore((state) => state.applications);
+  const pendingCount = applications.filter((a) => a.status === 'pending').length;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <AppHeader title="관리자 대시보드" subtitle="운영자/학교 관리자용 모바일 관리" showBack />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.statsRow}>
           <StatCard icon="school" label="동아리" value={`${clubs.length}`} />
-          <StatCard icon="person-add" label="승인 대기" value="2" />
+          <StatCard icon="person-add" label="심사 대기" value={`${pendingCount}`} />
           <StatCard icon="history" label="감사 로그" value="3" />
         </View>
 
         <Section title="운영 작업">
           <View style={styles.actionList}>
-            <TouchableOpacity style={styles.actionRow}>
-              <View style={styles.iconBox}>
-                <MaterialIcons name="add-business" size={22} color={colors.navyDeep} />
-              </View>
-              <View style={styles.actionText}>
-                <Text style={styles.actionTitle}>동아리 생성</Text>
-                <Text style={styles.actionBody}>운영자가 공식 동아리를 생성합니다.</Text>
-              </View>
-              <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
-            </TouchableOpacity>
+            {/* 가입 신청 관리 */}
+            <Link href="/admin/applications" asChild>
+              <TouchableOpacity style={styles.actionRow}>
+                <View style={styles.iconBox}>
+                  <MaterialIcons name="assignment" size={22} color={colors.navyDeep} />
+                </View>
+                <View style={styles.actionText}>
+                  <Text style={styles.actionTitle}>가입 신청 관리</Text>
+                  <Text style={styles.actionBody}>지원서를 검토하고 합격/불합격을 처리합니다.</Text>
+                </View>
+                {pendingCount > 0 && (
+                  <Badge label={`${pendingCount}건`} tone="gold" />
+                )}
+                <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
+              </TouchableOpacity>
+            </Link>
+
+            <Link href="/admin/create-club" asChild>
+              <TouchableOpacity style={styles.actionRow}>
+                <View style={styles.iconBox}>
+                  <MaterialIcons name="add-business" size={22} color={colors.navyDeep} />
+                </View>
+                <View style={styles.actionText}>
+                  <Text style={styles.actionTitle}>동아리 생성</Text>
+                  <Text style={styles.actionBody}>운영자가 공식 동아리를 생성합니다.</Text>
+                </View>
+                <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
+              </TouchableOpacity>
+            </Link>
+
             <TouchableOpacity style={styles.actionRow}>
               <View style={styles.iconBox}>
                 <MaterialIcons name="workspace-premium" size={22} color={colors.navyDeep} />
@@ -48,6 +72,7 @@ export default function AdminDashboardScreen() {
               </View>
               <MaterialIcons name="chevron-right" size={24} color={colors.inkMuted} />
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.actionRow}>
               <View style={styles.iconBox}>
                 <MaterialIcons name="verified-user" size={22} color={colors.navyDeep} />
@@ -126,12 +151,7 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 14,
   },
-  auditIndex: {
-    color: colors.gold,
-    fontSize: 16,
-    fontWeight: '900',
-    width: 20,
-  },
+  auditIndex: { color: colors.gold, fontSize: 16, fontWeight: '900', width: 20 },
   auditBody: { flex: 1 },
   auditTitle: { color: colors.inkDeep, fontSize: 15, fontWeight: '900' },
   auditMeta: { color: colors.inkMuted, fontSize: 12, marginTop: 3 },
@@ -144,3 +164,4 @@ const styles = StyleSheet.create({
   },
   backText: { color: colors.navyDeep, fontSize: 15, fontWeight: '900' },
 });
+
